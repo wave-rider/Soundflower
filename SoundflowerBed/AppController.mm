@@ -12,7 +12,7 @@
 
 AudioThruEngine	*gThruEngine2 = NULL;
 AudioThruEngine	*gThruEngine16 = NULL;
-Boolean startOnAwake = false;
+
 
 void	CheckErr(OSStatus err)
 {
@@ -814,34 +814,46 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			i--;
 			thelist.erase(toerase);
 		}
-		else if (0 == strcmp("Soundflower (64ch)", (*i).mName)) {
+		else if (0 == strcmp("Soundflower (16ch)", (*i).mName)) {
 			mSoundflower16Device = (*i).mID;
 			AudioDeviceList::DeviceList::iterator toerase = i;
 			i--;
 			thelist.erase(toerase);
 		}
+        else if (0 == strcmp("Soundflower (64ch)", (*i).mName)) {
+            mSoundflower16Device = (*i).mID;
+            AudioDeviceList::DeviceList::iterator toerase = i;
+            i--;
+            thelist.erase(toerase);
+        }
 	}
     
-    if (restartRequired){
+    if (restartRequired) {
         NSLog(@"restarting Thru Engines");
-        if (mSoundflower2Device && mSoundflower16Device) {
-            if(gThruEngine2){
-                delete gThruEngine2;
-            }
-            gThruEngine2 = new AudioThruEngine;
-            gThruEngine2->SetInputDevice(mSoundflower2Device);
-            
-            if(gThruEngine16){
-                delete gThruEngine16;
-            }
-            gThruEngine16 = new AudioThruEngine;
-            gThruEngine16->SetInputDevice(mSoundflower16Device);
-            
-            gThruEngine2->Start();
-            gThruEngine16->Start();
+        
+        if (gThruEngine2){
+            delete gThruEngine2;
+            gThruEngine2 = NULL;
+        }
+       
+        if (gThruEngine16){
+            delete gThruEngine16;
+            gThruEngine2 = NULL;
         }
     }
-    
+
+    if ((!gThruEngine2 || !gThruEngine16) && mSoundflower2Device && mSoundflower16Device) {
+
+        gThruEngine2 = new AudioThruEngine;
+        gThruEngine2->SetInputDevice(mSoundflower2Device);
+        
+        gThruEngine16 = new AudioThruEngine;
+        gThruEngine16->SetInputDevice(mSoundflower16Device);
+        
+        gThruEngine2->Start();
+        gThruEngine16->Start();
+    }
+
     [self InstallListeners];
     
 }
@@ -1097,109 +1109,86 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 - (void)readGlobalPrefs
 {
-	CFStringRef strng  = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("2ch Output Device"), kCFPreferencesCurrentApplication);
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    NSString *strng = [prefs stringForKey:@"2ch Output Device"];
 	if (strng) {
-		char name[64];
-		CFStringGetCString(strng, name, 64, kCFStringEncodingMacRoman);
-		NSMenuItem *item = [mMenu itemWithTitle:[NSString stringWithCString:name]];
+        NSMenuItem *item = [mMenu itemWithTitle:strng];
 		if (item)
 			[self outputDeviceSelected:item];
 	}
 	
-	strng  = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("16ch Output Device"), kCFPreferencesCurrentApplication);
+	strng = [prefs stringForKey:@"16ch Output Device"];
 	if (strng) {
-		char name[64];
-		CFStringGetCString(strng, name, 64, kCFStringEncodingMacRoman);
-		
 		// itemWithTitle only returns the first instance, and we need to find the second one, so
 		// make calculations based on index #
-		int index = [mMenu indexOfItemWithTitle:[NSString stringWithCString:name]];
+		int index = [mMenu indexOfItemWithTitle:strng];
 		if (index >= 0)
 			[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+index-m2StartIndex)]];
 	}
 	
-	CFNumberRef num = (CFNumberRef) CFPreferencesCopyAppValue(CFSTR("2ch Buffer Size"), kCFPreferencesCurrentApplication);
-	if (num) {
-		UInt32 val;
-		CFNumberGetValue(num, kCFNumberLongType, &val);	
-		CFRelease(num);
-		
-		switch (val) {
-			case 64:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:0]];
-				break;
-			case 128:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:1]];
-				break;
-			case 256:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:2]];
-				break;
-			case 1024:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:4]];
-				break;
-			case 2048:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:5]];
-				break;
-				
-			case 512:
-			default:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:3]];
-				break;
-		}
-	}
-	
-	num = (CFNumberRef) CFPreferencesCopyAppValue(CFSTR("16ch Buffer Size"), kCFPreferencesCurrentApplication);
-	if (num) {
-		UInt32 val;
-		CFNumberGetValue(num, kCFNumberLongType, &val);	
-		CFRelease(num);
-		
-		switch (val) {
-			case 64:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:0]];
-				break;
-			case 128:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:1]];
-				break;
-			case 256:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:2]];
-				break;
-			case 1024:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:4]];
-				break;
-			case 2048:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:5]];
-				break;
-				
-			case 512:
-			default:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:3]];
-				break;
-		}
+
+    switch ([prefs integerForKey:@"2ch Buffer Size"]) {
+        case 64:
+            [self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:0]];
+            break;
+        case 128:
+            [self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:1]];
+            break;
+        case 256:
+            [self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:2]];
+            break;
+        case 1024:
+            [self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:4]];
+            break;
+        case 2048:
+            [self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:5]];
+            break;
+            
+        case 512:
+        default:
+            [self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:3]];
+            break;
+    }
+			
+    switch ([prefs integerForKey:@"16ch Buffer Size"]) {
+        case 64:
+            [self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:0]];
+            break;
+        case 128:
+            [self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:1]];
+            break;
+        case 256:
+            [self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:2]];
+            break;
+        case 1024:
+            [self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:4]];
+            break;
+        case 2048:
+            [self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:5]];
+            break;
+            
+        case 512:
+        default:
+            [self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:3]];
+            break;
 	}
 }
 		
 - (void)writeGlobalPrefs
 {
-	CFStringRef cfstr = CFStringCreateWithCString(kCFAllocatorSystemDefault, [[mCur2chDevice title] cString], kCFStringEncodingMacRoman);
-	CFPreferencesSetAppValue(CFSTR("2ch Output Device"), cfstr, kCFPreferencesCurrentApplication);
-	CFRelease(cfstr); 
-	
-	cfstr = CFStringCreateWithCString(kCFAllocatorSystemDefault, [[mCur16chDevice title] cString], kCFStringEncodingMacRoman);
-	CFPreferencesSetAppValue(CFSTR("16ch Output Device"), cfstr, kCFPreferencesCurrentApplication);
-	CFRelease(cfstr);
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
 
-	UInt32 val = 64 << [m2chBuffer indexOfItem:mCur2chBufferSize];
-	CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberIntType, &val);
-	CFPreferencesSetAppValue(CFSTR("2ch Buffer Size"), number, kCFPreferencesCurrentApplication);
-	CFRelease(number);
-	
-	val = 64 << [m16chBuffer indexOfItem:mCur16chBufferSize];
-	number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberIntType, &val);
-	CFPreferencesSetAppValue(CFSTR("16ch Buffer Size"), number, kCFPreferencesCurrentApplication);
-	CFRelease(number);		
+    [prefs setObject:[mCur2chDevice title] forKey:@"2ch Output Device"];
+    [prefs setObject:[mCur16chDevice title] forKey:@"16ch Output Device"];
+    
+    UInt32 val = 64 << [m2chBuffer indexOfItem:mCur2chBufferSize];
+    [prefs setObject:[NSNumber numberWithInt:val] forKey:@"2ch Buffer Size"];
+    
+    val = 64 << [m16chBuffer indexOfItem:mCur16chBufferSize];
+    [prefs setObject:[NSNumber numberWithInt:val]  forKey:@"16ch Buffer Size"];
 
-	CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+    [prefs synchronize];
 }
 
 - (CFStringRef)formDevicePrefName:(BOOL)is2ch
