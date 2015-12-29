@@ -1,3 +1,7 @@
+**JUST LOOKING FOR SOUNDFLOWER INSTALLER??**
+you can find the lastest version here: https://github.com/mattingalls/Soundflower/releases/tag/2.0b2
+
+
 Soundflower Source ReadMe
 
 Originally by ma++ ingalls for Cycling'74
