@@ -7,13 +7,12 @@ is the latest version
 
 
 # THE MOST RELIABLE WAY TO UNINSTALL
-from the Finder, **HIT** Shift-Cmd-G and **TYPE**:
+From the Finder, **HIT** Shift-Cmd-G and **TYPE**:
 
 /Library/Extensions
 
-to open the folder.  
-look for a "Soundflower.kext" file 
-and **DRAG** it into the trash (you may be asked for the admin password)
+Then inside that folder, look for a "Soundflower.kext" file. If there is one,
+**DRAG** it into the trash (you may be asked for the admin password)
 
 **REPEAT**, typing in this folder path:
 
