@@ -25,7 +25,7 @@ Then inside that folder, look for a "Soundflower.kext" file. If there is one,
 
 
 
-# INSTRUCTIONS TO BUILD SOUNDFLOWER YOURSELF
+# ORIGINAL INSTRUCTIONS TO BUILD SOUNDFLOWER YOURSELF
 
 
 Soundflower Source ReadMe
