@@ -1,11 +1,11 @@
 
-** JUST LOOKING FOR SOUNDFLOWER INSTALLER?? **
+# JUST LOOKING FOR SOUNDFLOWER INSTALLER??
 you can find the lastest version here: https://github.com/mattingalls/Soundflower/releases/tag/2.0b2
 
 
 
 
-** THE MOST RELIABLE WAY TO UNINSTALL **
+# THE MOST RELIABLE WAY TO UNINSTALL
 in the finder, HIT Shift-Cmd-G and TYPE:
 /Library/Extensions
 to open the folder.  
@@ -22,7 +22,7 @@ RESTART
 
 
 
-** INSTRUCTIONS TO BUILD SOUNDFLOWER YOURSELF **
+# INSTRUCTIONS TO BUILD SOUNDFLOWER YOURSELF
 
 
 Soundflower Source ReadMe
