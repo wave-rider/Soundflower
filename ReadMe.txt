@@ -5,6 +5,21 @@ you can find the lastest version here: https://github.com/mattingalls/Soundflowe
 
 
 
+** THE MOST RELIABLE WAY TO UNINSTALL **
+in the finder, HIT Shift-Cmd-G and TYPE:
+/Library/Extensions
+to open the folder.  
+look for a "Soundflower.kext" file 
+and DRAG it into the trash (you may be asked for the admin password)
+
+REPEAT, typing in this folder path:
+/System/Library/Extensions
+
+RESTART
+
+
+
+
 
 
 ** INSTRUCTIONS TO BUILD SOUNDFLOWER YOURSELF **
