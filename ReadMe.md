@@ -1,5 +1,5 @@
 
-# JUST LOOKING FOR THE SOUNDFLOWER INSTALLER?
+# JUST LOOKING FOR THE (SIGNED) SOUNDFLOWER INSTALLER?
 https://github.com/mattingalls/Soundflower/releases/tag/2.0b2
 is the latest version
 
