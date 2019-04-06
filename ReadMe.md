@@ -31,10 +31,7 @@ Then inside that folder, look for a "Soundflower.kext" file. If there is one,
 Soundflower Source ReadMe
 
 Originally by ma++ ingalls for Cycling'74
-matt@sfsound.org
-
 Revised by Tim Place, 16 October 2008, for version 1.4 
-tim@electrotap.com
 
 
 
